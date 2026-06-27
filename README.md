@@ -92,6 +92,15 @@ Three mechanisms, most-local first:
    (each finding prints its fingerprint) so reviewed items don't re-alert while new
    ones still do.
 
+## Enterprise architecture
+
+| Pillar            | How leakguard applies it                                                                                                                    |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Resilience**    | never crashes on bad input — binary files, oversized/minified lines, and unreadable files are skipped, not fatal                            |
+| **Redundancy**    | defense-in-depth: three detection layers (rules + entropy + filename) across three enforcement points (CLI, git hook, CI)                   |
+| **Observability** | structured `--json` findings with severity, location, rule id, and a stable fingerprint per finding                                         |
+| **Idempotency**   | deterministic fingerprints (`sha256(file+rule+secret)`) make re-scans reproducible — a baseline survives them while new secrets still alert |
+
 ## Validation
 
 leakguard is tested the way a security tool should be:
