@@ -1,0 +1,21 @@
+# Drop this in your repo at .github/workflows/leakguard.yml to block secrets in CI.
+# (Until leakguard is published to npm, this builds it from source.)
+name: leakguard
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install leakguard
+        run: |
+          git clone --depth 1 https://github.com/your-handle/leakguard /tmp/leakguard
+          (cd /tmp/leakguard && npm ci && npm run build)
+
+      - name: Scan for secrets
+        run: node /tmp/leakguard/dist/cli.js scan .

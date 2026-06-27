@@ -1,0 +1,5 @@
+# The rule catalog necessarily contains secret *patterns* (e.g. a PEM header).
+src/rules.ts
+
+# The test corpus and fixtures intentionally contain fake secret samples.
+test/

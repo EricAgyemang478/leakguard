@@ -1,0 +1,41 @@
+{
+  "name": "leakguard",
+  "version": "1.0.0",
+  "description": "A fast, zero-dependency secret scanner — catch credentials before they go public. Runs as a CLI, a git pre-commit/pre-push hook, and a GitHub Action.",
+  "type": "module",
+  "bin": {
+    "leakguard": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test \"test/**/*.test.ts\"",
+    "lint": "prettier --check .",
+    "format": "prettier --write .",
+    "scan": "tsx src/cli.ts scan ."
+  },
+  "keywords": [
+    "security",
+    "secrets",
+    "secret-scanning",
+    "credentials",
+    "pre-commit",
+    "devsecops",
+    "cli"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
