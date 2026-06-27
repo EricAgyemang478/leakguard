@@ -4,14 +4,28 @@ How leakguard is built, how a scan flows, and the reasoning behind the choices.
 
 ## The pipeline
 
+```mermaid
+flowchart LR
+    CLI["CLI · scan"] --> SC
+    Hook["git hook · pre-commit/push"] --> SC
+    CI["GitHub Action · CI"] --> SC
+
+    SC["Scanner · per line"] --> RULES["Rules · 90 provider patterns"]
+    SC --> ENT["Entropy · unknown secrets"]
+    SC --> FN["Filenames · .env, keys, certs"]
+
+    RULES --> DEDUPE["Dedupe · keep most severe"]
+    ENT --> DEDUPE
+    FN --> DEDUPE
+
+    DEDUPE --> Q{"Secret found?"}
+    Q -->|yes| BLOCK["⛔ exit 1 — block commit / push / CI"]
+    Q -->|no| PASS["✓ exit 0 — safe to publish"]
 ```
-files (walk / git) ──► per file ──► per line ──► detectors ──► dedupe ──► report
-                                                    │
-                              ┌─────────────────────┼─────────────────────┐
-                              ▼                     ▼                     ▼
-                          rule regexes          entropy            (filename rules
-                          (90 patterns)     (unknown secrets)       per file, by name)
-```
+
+The same scanner runs from three entry points, so a secret is stopped at the
+earliest one that fires — ideally the local commit, before it ever reaches a
+remote where the only safe fix is rotation.
 
 1. **Source selection.** Three modes feed the same scanner:
    - `scan <path>` walks the tree (`lib/walk.ts`), skipping VCS/dependency/build

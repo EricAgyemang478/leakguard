@@ -1,6 +1,6 @@
 # leakguard
 
-[![CI](https://img.shields.io/github/actions/workflow/status/your-handle/leakguard/ci.yml?branch=main&label=CI)](https://github.com/your-handle/leakguard/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/EricAgyemang478/leakguard/ci.yml?branch=main&label=CI)](https://github.com/EricAgyemang478/leakguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-34d399)](./LICENSE)
 [![deps](https://img.shields.io/badge/runtime%20deps-0-blue)](package.json)
 [![Node](https://img.shields.io/badge/node-%E2%89%A520-339933)](.nvmrc)
@@ -15,6 +15,24 @@ not discovered after it's been pushed (where the only safe fix is rotation).
   CRITICAL  src/config.ts:14:22  [aws-access-key-id]
             AWS Access Key ID
             AKI…LE (20 chars)  ·  fingerprint 0e941deced0257a7
+```
+
+## How it works
+
+```mermaid
+flowchart LR
+    CLI["CLI · scan"] --> SC
+    Hook["git hook · pre-commit/push"] --> SC
+    CI["GitHub Action · CI"] --> SC
+    SC["Scanner · per line"] --> R["Rules · 90 patterns"]
+    SC --> E["Entropy · unknown secrets"]
+    SC --> F["Filenames · .env, keys"]
+    R --> D["Dedupe"]
+    E --> D
+    F --> D
+    D --> Q{"Secret found?"}
+    Q -->|yes| B["⛔ block commit / push / CI"]
+    Q -->|no| P["✓ safe to publish"]
 ```
 
 ## Why
