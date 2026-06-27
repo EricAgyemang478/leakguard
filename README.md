@@ -105,4 +105,4 @@ test/                 # per-rule, corpus, and unit tests
 
 ## License
 
-[MIT](./LICENSE) © Eric Opoku
+[MIT](./LICENSE) © Eric Agyemang
