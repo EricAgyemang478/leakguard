@@ -429,7 +429,7 @@ export const RULES: Rule[] = [
     description:
       "Generic assignment of an API key / secret / token / password to a quoted value of sufficient length and entropy.",
     regex: new RegExp(
-      "(?:api[_-]?key|apikey|secret[_-]?key|secret|client[_-]?secret|access[_-]?token|auth[_-]?token|token|password|passwd|pwd)[\"']?\\s*[:=]\\s*(?:[\"']([^\"'\\s]{8,})[\"']|([A-Za-z0-9_\\-./+=@!$%]{16,}))",
+      "(?:api[_-]?key|apikey|secret[_-]?key|secret|client[_-]?secret|access[_-]?token|auth[_-]?token|token|password|passwd|pwd)[\"']?\\s*[:=]\\s*(?![\"']?(?:process\\.env|import\\.meta|os\\.environ|process\\[|\\$\\{|\\{\\{))(?:[\"']([^\"'\\s]{8,})[\"']|([A-Za-z0-9_\\-./+=@!$%]{16,}))",
       "i",
     ),
   },

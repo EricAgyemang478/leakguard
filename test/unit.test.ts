@@ -69,3 +69,10 @@ test("a clean config line produces no findings", () => {
   const line = "export const PORT = 3000; // default port";
   assert.equal(scanContent("f.ts", line, opts).length, 0);
 });
+
+test("env-var references are not flagged as secrets", () => {
+  assert.equal(scanContent("f.ts", "const k = process.env.OPENAI_API_KEY;", opts).length, 0);
+  assert.equal(scanContent("f.ts", "apiKey: process.env.ANTHROPIC_API_KEY", opts).length, 0);
+  assert.equal(scanContent("f.ts", "token: import.meta.env.VITE_TOKEN", opts).length, 0);
+  assert.equal(scanContent("f.ts", 'password = "${DB_PASSWORD}"', opts).length, 0);
+});
