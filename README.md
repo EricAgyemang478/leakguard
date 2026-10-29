@@ -6,8 +6,8 @@
 [![Node](https://img.shields.io/badge/node-%E2%89%A520-339933)](.nvmrc)
 
 **Catch credentials before they go public.** A fast, **zero-dependency** secret
-scanner that runs three ways — a **CLI**, a **git pre-commit / pre-push hook**,
-and a **GitHub Action** — so a secret is stopped at the earliest possible point,
+scanner that runs three ways (a **CLI**, a **git pre-commit / pre-push hook**,
+and a **GitHub Action**), so a secret is stopped at the earliest possible point,
 not discovered after it's been pushed (where the only safe fix is rotation).
 
 ```
@@ -37,30 +37,30 @@ flowchart LR
 
 ## Why
 
-A leaked key in git history is **irreversible** — deleting the file doesn't help;
+A leaked key in git history is **irreversible**: deleting the file doesn't help;
 public commits are scraped within minutes, so the credential must be rotated.
 leakguard's job is to make sure it never reaches that point.
 
 ## What it detects
 
-- **90 rules across 45+ providers** — AWS, GitHub/GitLab, Google/GCP, Slack,
+- **90 rules across 45+ providers**: AWS, GitHub/GitLab, Google/GCP, Slack,
   Stripe, OpenAI/Anthropic/OpenRouter/HuggingFace, Twilio, SendGrid, Mailgun,
   Resend, npm, PyPI, Datadog, Sentry, Doppler, Cloudflare, DigitalOcean, Plaid,
   Shopify, Discord, Telegram, Supabase, Square, Atlassian, Notion, Postman, and more.
-- **Entropy detection** for unknown/custom secrets — high-Shannon-entropy tokens,
+- **Entropy detection** for unknown/custom secrets: high-Shannon-entropy tokens,
   with guards that suppress the usual noise (git/SHA hashes, integrity hashes,
   PEM blocks, public keys, and base64-of-text).
-- **Filename rules** — flags committing a `.env`, `id_rsa`, `*.pem`, keystore, etc.
-- **Private keys** — RSA / EC / OpenSSH / PGP / PKCS#8 / PuTTY blocks.
+- **Filename rules**: flags committing a `.env`, `id_rsa`, `*.pem`, keystore, etc.
+- **Private keys**: RSA / EC / OpenSSH / PGP / PKCS#8 / PuTTY blocks.
 
 Every rule is verified against its own samples and an **adversarial corpus** of
-real-looking secrets (must flag) and tricky decoys (must not) — see
+real-looking secrets (must flag) and tricky decoys (must not); see
 [Validation](#validation).
 
 ## Install & use
 
 ```bash
-npm install        # dev deps only — leakguard has zero runtime deps
+npm install        # dev deps only; leakguard has zero runtime deps
 npm run build
 
 node dist/cli.js scan .          # scan a directory
@@ -70,7 +70,7 @@ node dist/cli.js install-hooks   # install git pre-commit + pre-push hooks
 | Command                         | What it does                                     |
 | ------------------------------- | ------------------------------------------------ |
 | `leakguard scan [path]`         | Scan a directory (default `.`)                   |
-| `leakguard scan --staged`       | Scan git-staged content — use in **pre-commit**  |
+| `leakguard scan --staged`       | Scan git-staged content; use in **pre-commit**   |
 | `leakguard scan --diff <range>` | Scan files changed in a commit range             |
 | `leakguard install-hooks`       | Install pre-commit + pre-push hooks in this repo |
 
@@ -86,31 +86,31 @@ Copy [`examples/github-action.yml`](examples/github-action.yml) to
 
 Three mechanisms, most-local first:
 
-1. **Inline** — add `leakguard:allow` (or `pragma: allowlist secret`) to the line.
-2. **Path** — add a gitignore-style glob to `.leakguardignore`.
-3. **Baseline** — record accepted finding fingerprints in `.leakguard-baseline.json`
+1. **Inline**: add `leakguard:allow` (or `pragma: allowlist secret`) to the line.
+2. **Path**: add a gitignore-style glob to `.leakguardignore`.
+3. **Baseline**: record accepted finding fingerprints in `.leakguard-baseline.json`
    (each finding prints its fingerprint) so reviewed items don't re-alert while new
    ones still do.
 
 ## Enterprise architecture
 
-| Pillar            | How leakguard applies it                                                                                                                    |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Resilience**    | never crashes on bad input — binary files, oversized/minified lines, and unreadable files are skipped, not fatal                            |
-| **Redundancy**    | defense-in-depth: three detection layers (rules + entropy + filename) across three enforcement points (CLI, git hook, CI)                   |
-| **Observability** | structured `--json` findings with severity, location, rule id, and a stable fingerprint per finding                                         |
-| **Idempotency**   | deterministic fingerprints (`sha256(file+rule+secret)`) make re-scans reproducible — a baseline survives them while new secrets still alert |
+| Pillar            | How leakguard applies it                                                                                                                      |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Resilience**    | never crashes on bad input: binary files, oversized/minified lines, and unreadable files are skipped, not fatal                               |
+| **Redundancy**    | defense-in-depth: three detection layers (rules + entropy + filename) across three enforcement points (CLI, git hook, CI)                     |
+| **Observability** | structured `--json` findings with severity, location, rule id, and a stable fingerprint per finding                                           |
+| **Idempotency**   | deterministic fingerprints (`sha256(file+rule+secret)`) make re-scans reproducible, so a baseline survives them while new secrets still alert |
 
 ## Validation
 
 leakguard is tested the way a security tool should be:
 
-- **Per-rule regression** — every rule must match its own example samples.
-- **Adversarial corpus** — 43 real-looking secrets across providers that **must**
+- **Per-rule regression**: every rule must match its own example samples.
+- **Adversarial corpus**: 43 real-looking secrets across providers that **must**
   be flagged, and 39 decoys (UUIDs, git SHAs, integrity hashes, base64 text,
-  public keys, placeholders) that **must not** be — zero false positives.
-- **Stress-tested** — 400 files (~3.3 MB) scan in ~1.2 s; binary files, minified
-  lines, deep trees, and unicode are all handled.
+  public keys, placeholders) that **must not** be, with zero false positives.
+- **Safe on messy repos**: the file walker skips dependencies, binaries, lockfiles,
+  and oversized files, and the scanner skips minified lines over 5,000 characters.
 
 Full design rationale in **[ARCHITECTURE.md](./ARCHITECTURE.md)**.
 
